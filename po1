@@ -1,0 +1,10 @@
+npm install express --save
+npm install morgan --save
+npm install body-parser --save
+npm install uuid --save
+npm install mongoose --save
+
+npm install chai --save-dev
+npm install chai-http --save-dev
+npm install mocha --save-dev
+
