@@ -1,4 +1,4 @@
 
-# Code Capstone Project
+# Node Capstone Project
 
-[For details, see](https://www.johnvincent.io/node-capstone/)
+[For details, see article](https://www.johnvincent.io/node-capstone/)
