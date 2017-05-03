@@ -4,8 +4,24 @@
 'use strict';
 
 const express = require('express');
+const morgan = require('morgan');
 const app = express();
+
+// const blogRouter = require('./blogRouter');
+
+app.use(morgan('common'));
+
 app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/views/index.html');
+});
+
+app.get('/content', (req, res) => {
+    res.sendFile(__dirname + '/views/content.html');
+});
+
+// app.use('/blog', blogRouter);
 
 let server;
 

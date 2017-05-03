@@ -48,7 +48,7 @@ describe('content.html', function() {
 
     it('should get content page', function() {
         return chai.request(app)
-            .get('/content.html')
+            .get('/content')
             .then(function(res) {
                 res.should.have.status(200);
 /* jshint -W030 */

@@ -1,0 +1,16 @@
+/*
+sass --watch scss:css --style expanded
+sass --watch scss:css --line-numbers --style expanded
+sass --watch scss:css --line-numbers --style compressed
+*/
+/* line 8, ../scss/style.scss */
+* {
+  box-sizing: border-box;
+}
+
+/* line 12, ../scss/style.scss */
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+/*# sourceMappingURL=style.css.map */

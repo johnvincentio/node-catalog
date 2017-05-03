@@ -2,11 +2,11 @@
   "name": "node-catalog",
   "version": "1.0.0",
   "description": "",
-    "main": "server.js",
-    "scripts": {
-      "start": "node server.js",
-      "test": "mocha ./test"
-    },
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "mocha ./test"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/johnvincentio/node-catalog.git"
@@ -27,6 +27,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
+    "faker": "^4.1.0",
     "mocha": "^3.3.0"
   }
 }
