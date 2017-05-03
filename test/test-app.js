@@ -35,3 +35,24 @@ describe('index.html', function() {
             });
     });
 });
+
+describe('content.html', function() {
+
+    before(function() {
+        return runServer();
+    });
+
+    after(function() {
+        return closeServer();
+    });
+
+    it('should get content page', function() {
+        return chai.request(app)
+            .get('/content.html')
+            .then(function(res) {
+                res.should.have.status(200);
+/* jshint -W030 */
+                res.should.be.html;
+            });
+    });
+});
