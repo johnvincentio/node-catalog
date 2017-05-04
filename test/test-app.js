@@ -56,3 +56,24 @@ describe('content.html', function() {
             });
     });
 });
+
+describe('lighting.html', function() {
+
+    before(function() {
+        return runServer();
+    });
+
+    after(function() {
+        return closeServer();
+    });
+
+    it('should get content page', function() {
+        return chai.request(app)
+            .get('/lighting')
+            .then(function(res) {
+                res.should.have.status(200);
+/* jshint -W030 */
+                res.should.be.html;
+            });
+    });
+});

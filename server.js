@@ -21,6 +21,10 @@ app.get('/content', (req, res) => {
     res.sendFile(__dirname + '/views/content.html');
 });
 
+app.get('/lighting', (req, res) => {
+    res.sendFile(__dirname + '/views/lighting.html');
+});
+
 // app.use('/blog', blogRouter);
 
 let server;
@@ -56,4 +60,3 @@ if (require.main === module) {
 }
 
 module.exports = {app, runServer, closeServer};
-
