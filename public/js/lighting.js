@@ -4,11 +4,6 @@
 var MOCK_DATA = {
     "lighting": {
 
-  "resultInfo": {
-    "result": "success",
-    "resultCode": 200
-  },
-  "data": {
     "list": [
       {
         "id": 0,
@@ -2304,7 +2299,6 @@ var MOCK_DATA = {
       }
     ]
   }
-}
 };
 
 function getData(callbackFn) {
@@ -2312,9 +2306,9 @@ function getData(callbackFn) {
 }
 
 function displayLighting(data) {
-    for (var index in data.lighting.data.list) {
-        var html = '<p>' + data.lighting.data.list[index].displayText + '</p>';
-        var v1 = data.lighting.data.list[index];
+    for (var index in data.lighting.list) {
+        var html = '<p>' + data.lighting.list[index].displayText + '</p>';
+        var v1 = data.lighting.list[index];
         for (var idx in v1.itemSet) {
             var v2 = v1.itemSet[idx];
             var d1 = "<div>" + v2.displayText + "</div";

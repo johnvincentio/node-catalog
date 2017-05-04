@@ -4,11 +4,6 @@
 
 var MOCK_DATA = {
 "locations": {
-  "resultInfo": {
-    "result": "success",
-    "resultCode": 200
-  },
-  "data": {
     "hesLocations": [
       {
         "id": 1,
@@ -222,7 +217,6 @@ var MOCK_DATA = {
       }
     ]
   }
-}
 };
 
 function getLocationsData(callbackFn) {
@@ -230,14 +224,13 @@ function getLocationsData(callbackFn) {
 }
 
 function displayLocations(data) {
-    for (var index in data.locations.data.hesLocations) {
-       $('#hes_locations').append('<p>' + data.locations.data.hesLocations[index].address + '</p>');
+    for (var index in data.locations.hesLocations) {
+       $('#hes_locations').append('<p>' + data.locations.hesLocations[index].address + '</p>');
     }
-    for (index in data.locations.data.cineleaseLocations) {
-       $('#cinelease_locations').append('<p>' + data.locations.data.cineleaseLocations[index].address + '</p>');
+    for (index in data.locations.cineleaseLocations) {
+       $('#cinelease_locations').append('<p>' + data.locations.cineleaseLocations[index].address + '</p>');
     }
 }
-// data.locations.data.hesLocations
 
 function getAndDisplayLocations() {
     getLocationsData(displayLocations);
