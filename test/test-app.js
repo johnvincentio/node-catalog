@@ -67,7 +67,7 @@ describe('lighting.html', function() {
         return closeServer();
     });
 
-    it('should get content page', function() {
+    it('should get lighting page', function() {
         return chai.request(app)
             .get('/lighting')
             .then(function(res) {
