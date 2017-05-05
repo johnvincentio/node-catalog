@@ -4,8 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "test": "mocha ./test"
+      "start": "node server.js",
+      "test": "mocha ./test",
+      "devtool-app": "devtool server.js",
+      "devtool-test": "devtool ./node_modules/mocha/bin/_mocha ./test"
   },
   "repository": {
     "type": "git",
