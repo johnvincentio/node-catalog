@@ -9,6 +9,8 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 
+const {LOCATIONS1} = require('../helpers/helper');
+
 const {Locations1Model} = require('../models/locations1');
 
 router.get('/', (req, res) => {
@@ -37,6 +39,25 @@ router.get('/:id', (req, res) => {
                 res.status(204).json({message: `Record ${req.params.id} not found`});
             }
         })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({message: 'Internal Server error'});
+        });
+});
+
+router.post('/', jsonParser, (req, res) => {
+    const requiredFields = LOCATIONS1.required_keys;
+    for (let i = 0; i < requiredFields.length; i++) {
+        const field = requiredFields[i];
+        if (!(field in req.body)) {
+            const message = `Missing \`${field}\` in request body`;
+            console.error(message);
+            return res.status(400).send(message);
+        }
+    }
+
+    Locations1Model.create(LOCATIONS1.create(req.body))
+        .then(item => res.status(201).json(item.getAll()))
         .catch(err => {
             console.error(err);
             res.status(500).json({message: 'Internal Server error'});

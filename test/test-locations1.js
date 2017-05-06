@@ -13,15 +13,14 @@ const mongoose = require('mongoose');
 const {app, runServer, closeServer} = require('../server');
 const {TEST_DATABASE_URL} = require('../config');
 
+const {LOCATIONS1} = require('../helpers/helper');
+
 const {Locations1Model} = require('../models/locations1');
 
 /* jshint -W098 */
 const should = chai.should();
 
 chai.use(chaiHttp);
-
-const ENDPOINT = '/api/locations1/';
-const EXPECTED_KEYS = ['id', 'branch', 'city', 'state', 'zip', 'phone', 'fax', 'seqno', 'created'];
 
 function generateData(i) {
     return {
@@ -32,13 +31,12 @@ function generateData(i) {
         zip: faker.address.zipCode(),
         phone: faker.phone.phoneNumber(),
         fax: faker.phone.phoneNumber(),
-        seqno: i,
-        created: faker.date.past()
+        seqno: i
     };
 }
 
 function seedData() {
-    console.info('seeding data');
+//    console.info('seeding data');
     const data = [];
     for (let i=1; i<=10; i++) {
         data.push(generateData(i));
@@ -54,6 +52,24 @@ function tearDownDb() {
         .then(result => resolve(result))
         .catch(err => reject(err));
     });
+}
+
+function checkres(res, status, many) {
+    res.should.have.status(status);    // 2
+/* jshint -W030 */
+    res.should.be.json;
+    if (many) {
+        res.body.length.should.be.at.least(1);
+        res.body.should.be.a('array');
+        res.body.forEach(function(item) {
+            item.should.be.a('object');
+            item.should.include.keys(LOCATIONS1.expected_keys);
+        });
+    }
+    else {
+    res.body.should.be.a('object');
+    res.body.should.include.keys(LOCATIONS1.expected_keys);
+    }
 }
 
 describe('Locations_1 API resources', function() {
@@ -84,11 +100,10 @@ describe('Locations_1 API resources', function() {
         let res;
         it('should return all locations_1', function() {
             return chai.request(app)
-                .get(ENDPOINT)               // 1
-                .then(function(_res) {      // 2
+                .get(LOCATIONS1.endpoint)               // 1
+                .then(function(_res) {
                     res = _res;
-                    res.should.have.status(200);
-                    res.body.length.should.be.at.least(1);
+                    checkres(res, 200, true);           // 2
                     return Locations1Model.count();
                 })
                 .then(function(count) {     // 3
@@ -106,31 +121,14 @@ describe('Locations_1 API resources', function() {
        it('should return fields with correct values', function() {
            let _res;
             return chai.request(app)
-                .get(ENDPOINT)               // 1
+                .get(LOCATIONS1.endpoint)           // 1
                 .then(function(res) {
-                    res.should.have.status(200);    // 2
-    /* jshint -W030 */
-                    res.should.be.json;
-                    res.body.should.be.a('array');
-                    res.body.length.should.be.at.least(1);
-
-                    res.body.forEach(function(item) {
-                        item.should.be.a('object');
-                        item.should.include.keys(EXPECTED_KEYS);
-                    });
-                    _res = res.body[0];     // first record
-                    return Locations1Model.findById(_res.id).exec();      // 3
+                    checkres(res, 200, true);       // 2
+                    _res = res;
+                    return Locations1Model.findById(res.body[0].id).exec();      // 3
                 })
                 .then(function(doc) {      // 4
-                    doc.id.should.equal(_res.id);
-                    doc.branch.should.equal(_res.branch);
-                    doc.city.should.equal(_res.city);
-                    doc.state.should.equal(_res.state);
-                    doc.zip.should.equal(_res.zip);
-                    doc.phone.should.equal(_res.phone);
-                    doc.fax.should.equal(_res.fax);
-                    doc.seqno.should.equal(_res.seqno);
-                    doc.created.toJSON().should.equal(_res.created); // json formatted ISO date
+                    LOCATIONS1.checkEqual(doc, _res.body[0]);
                 });
         });
     });
@@ -151,26 +149,133 @@ describe('Locations_1 API resources', function() {
                 .then(function(_doc) {
                     doc = _doc;
                     return chai.request(app)
-                        .get(ENDPOINT+doc.id);     // 2
+                        .get(LOCATIONS1.endpoint+doc.id);     // 2
                 })
                 .then(function(res) {
-                    res.should.have.status(200);        // 3
-    /* jshint -W030 */
-                    res.should.be.json;
-                    res.body.should.be.a('object');
-                    res.body.should.include.keys(EXPECTED_KEYS);
-                    res.body.id.should.equal(doc.id);          // 4
-                    res.body.branch.should.equal(doc.branch);
-                    res.body.city.should.equal(doc.city);
-                    res.body.state.should.equal(doc.state);
-                    res.body.zip.should.equal(doc.zip);
-                    res.body.phone.should.equal(doc.phone);
-                    res.body.fax.should.equal(doc.fax);
-                    res.body.seqno.should.equal(doc.seqno);
-                    res.body.created.should.equal(doc.created.toJSON()); // json formatted ISO date
+                    checkres(res, 200, false);                // 3
+                    LOCATIONS1.checkEqual(doc, res.body);     // 4
                 });
         });
     });
+
+    describe('POST endpoint', function() {
+/*
+ strategy:
+    1. create a new record
+    2. post the record
+    3. prove res has right status, data type
+    4. verify fields have correct values
+    5. get the record by id
+    6. verify record is identical to the new record.
+*/
+        it('should add a new record', function() {
+            const data = generateData(1);     // 1
+
+            return chai.request(app)
+                .post(LOCATIONS1.endpoint)              // 2
+                .send(data)
+                .then(function(res) {
+                    res.should.have.status(201);        // 3
+                /* jshint -W030 */
+                    res.should.be.json;
+                    res.body.should.be.a('object');
+                    res.body.should.include.keys(LOCATIONS1.expected_keys);
+                    res.body.id.should.not.be.null;
+
+                    data.id = res.body.id;
+                    LOCATIONS1.checkEqual(data, res.body);     // 4
+
+                    return Locations1Model.findById(res.body.id).exec();      // 5
+                })
+                .then(function(doc) {      // 6
+                    LOCATIONS1.checkEqual(doc, data);
+                });
+        });
+    });
+
+    describe('POST endpoint error conditions', function() {
+
+/*
+strategy:
+1. create a new record missing title field
+2. make a POST request with that record
+3. ensure status code = 400
+*/
+        it('should fail to add a new record - missing title', function() {
+            const newBlog = generateData();
+            delete newBlog.title;
+            chai.request(app)
+                .post('/blog')
+                .send(newBlog)
+            .then(() => {
+                throw Error('should have failed with a 400');
+            })
+            .catch(e => {
+                e.status.should.equal(400);
+            });
+        });
+
+        /*
+strategy:
+1. create a new record missing content field
+2. make a POST request with that record
+3. ensure status code = 400
+*/
+        it('should fail to add a new record - missing content', function() {
+            const newBlog = generateData();
+            delete newBlog.content;
+            chai.request(app)
+                .post('/blog')
+                .send(newBlog)
+            .then(() => {
+                throw Error('should have failed with a 400');
+            })
+            .catch(e => {
+                e.status.should.equal(400);
+            });
+        });
+
+/*
+strategy:
+1. create a new record missing firstName field
+2. make a POST request with that record
+3. ensure status code = 400
+*/
+        it('should fail to add a new record - missing firstName', function() {
+            const newBlog = generateData();
+            delete newBlog.author.firstName;
+            chai.request(app)
+                .post('/blog')
+                .send(newBlog)
+            .then(() => {
+                throw Error('should have failed with a 400');
+            })
+            .catch(e => {
+                e.status.should.equal(400);
+            });
+        });
+
+/*
+strategy:
+1. create a new record missing lastName field
+2. make a POST request with that record
+3. ensure status code = 400
+*/
+        it('should fail to add a new record - missing lastName', function() {
+            const newBlog = generateData();
+            delete newBlog.author.lastName;
+            chai.request(app)
+                .post('/blog')
+                .send(newBlog)
+            .then(() => {
+                throw Error('should have failed with a 400');
+            })
+            .catch(e => {
+                e.status.should.equal(400);
+            });
+        });
+    });
+
 
     describe('DELETE endpoint', function() {
 /*
@@ -188,14 +293,14 @@ Strategy:
                 .exec()
                 .then(function(doc) {
                     _doc = doc;
-                    return chai.request(app).delete(`${ENDPOINT}${doc.id}`);   // 2
+                    return chai.request(app).delete(`${LOCATIONS1.endpoint}${doc.id}`);   // 2
                 })
                 .then(function(res) {
                     res.should.have.status(204);        // 3
                     return Locations1Model.findById(_doc.id).exec();      // 4
                 })
-                .then(function(_bad) {      // 5
-                    should.not.exist(_bad);
+                .then(function(_gone) {      // 5
+                    should.not.exist(_gone);
                 });
         });
 
@@ -205,9 +310,9 @@ Strategy:
 2. make a delete request for that id
 3. assert that response has correct status code
 */
-        it('delete blog by non-existent id', function() {
+        it('delete by non-existent id', function() {
             let myid = mongoose.Types.ObjectId();       // 1
-            return chai.request(app).delete(`${ENDPOINT}${myid}`)       // 2
+            return chai.request(app).delete(`${LOCATIONS1.endpoint}${myid}`)       // 2
             .then(res => {
                 res.should.have.status(204);        // 3
             });

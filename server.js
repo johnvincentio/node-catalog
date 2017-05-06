@@ -12,6 +12,8 @@ mongoose.Promise = global.Promise;
 
 const {PORT, DATABASE_URL} = require('./config');
 
+const {LOCATIONS1} = require('./helpers/helper');
+
 const locations1Router = require('./routers/locations1');
 
 app.use(morgan('common'));
@@ -30,7 +32,7 @@ app.get('/lighting', (req, res) => {
     res.sendFile(__dirname + '/views/lighting.html');
 });
 
-app.use('/api/locations1', locations1Router);
+app.use(LOCATIONS1.endpoint, locations1Router);
 
 // catch-all endpoint if client makes request to non-existent endpoint
 app.use('*', function(req, res) {

@@ -38,21 +38,20 @@ const locations1Schema = mongoose.Schema({
     seqno: {
         type: Number,
         required: true
-    },
-    created: {type: Date, default: Date.now}
+    }
 }, {collection: 'locations_1'});
 
 locations1Schema.methods.getAll = function() {
     return {
         id: this._id,
         branch: this.branch,
+        address: this.address,
         city: this.city,
         state: this.state,
         zip: this.zip,
         phone: this.phone,
         fax: this.fax,
-        seqno: this.seqno,
-        created: this.created
+        seqno: this.seqno
     };
 };
 
