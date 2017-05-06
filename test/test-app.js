@@ -10,6 +10,8 @@ const chaiHttp = require('chai-http');
 
 const {app, runServer, closeServer} = require('../server');
 
+const {TEST_DATABASE_URL} = require('../config');
+
 /* jshint -W098 */
 const should = chai.should();
 
@@ -18,7 +20,7 @@ chai.use(chaiHttp);
 describe('index.html', function() {
 
     before(function() {
-        return runServer();
+        return runServer(TEST_DATABASE_URL);
     });
 
     after(function() {
@@ -39,7 +41,7 @@ describe('index.html', function() {
 describe('content.html', function() {
 
     before(function() {
-        return runServer();
+        return runServer(TEST_DATABASE_URL);
     });
 
     after(function() {
@@ -60,7 +62,7 @@ describe('content.html', function() {
 describe('lighting.html', function() {
 
     before(function() {
-        return runServer();
+        return runServer(TEST_DATABASE_URL);
     });
 
     after(function() {
