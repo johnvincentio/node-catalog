@@ -78,4 +78,32 @@ router.delete('/:id', (req, res) => {
         });
 });
 
+router.put('/:id', jsonParser, (req, res) => {
+    console.log("Put request; req.params.id "+req.params.id);
+        if (! (req.params.id && req.body.id && req.params.id === req.body.id)) {
+        const message2 = (
+            `Request path id (${req.params.id}) and request body id ${req.body.id}) must match`);
+        console.error(message2);
+        res.status(400).send(message2);
+    }
+
+    const toUpdate = {};
+    const updateableFields = LOCATIONS1.update_keys;
+    updateableFields.forEach(field => {
+        if (field in req.body) {
+            toUpdate[field] = req.body[field];
+        }
+    });
+
+    // {new: true} will return the updated version of the record.
+    console.log(`Updating item \`${req.params.id}\``);
+    Locations1Model.findByIdAndUpdate(req.params.id, {$set: toUpdate}, {new: true})
+        .exec()
+        .then(item => res.status(201).json(item.getAll()))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({message: 'Internal Server error'});
+        });
+});
+
 module.exports = router;

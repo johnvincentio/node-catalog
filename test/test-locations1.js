@@ -190,7 +190,7 @@ describe('Locations_1 API resources', function() {
         });
     });
 
-    describe.only('POST endpoint error conditions', function() {
+    describe('POST endpoint error conditions', function() {
 
 /*
 strategy:
@@ -258,6 +258,39 @@ Strategy:
             return chai.request(app).delete(`${LOCATIONS1.endpoint}${myid}`)       // 2
             .then(res => {
                 res.should.have.status(204);        // 3
+            });
+        });
+    });
+
+    describe('PUT endpoint', function() {
+/*
+Strategy:
+1. Get an existing record
+2. Put request to update the data.
+3. Prove data returned by request is the same data used in the update.
+4. Get record from database by id
+5. Prove data in database is the same data used in the update.
+*/
+        it('should update fields you send over', function() {
+            const data = generateData(1);
+
+            return Locations1Model        // 1
+                .findOne()
+                .exec()
+                .then(function(doc) {
+                    data.id = doc.id;
+                    return chai.request(app)
+                        .put(`${LOCATIONS1.endpoint}${data.id}`)      // 2
+                        .send(data);
+            })
+            .then(function(res) {
+                checkres(res, 201, false);                  // 3
+                LOCATIONS1.checkEqual (data, res.body);     // 3
+
+                return Locations1Model.findById(data.id).exec();      // 4
+            })
+            .then(function(doc) {
+                LOCATIONS1.checkEqual(doc, data);       // 5
             });
         });
     });

@@ -6,6 +6,7 @@ exports.LOCATIONS1 = {
     endpoint: '/api/locations1/',
     expected_keys: ['id', 'branch', 'address', 'city', 'state', 'zip', 'phone', 'fax', 'seqno'],
     required_keys: ['branch', 'address', 'city', 'state', 'zip', 'phone', 'seqno'],
+    update_keys: ['branch', 'address', 'city', 'state', 'zip', 'phone', 'fax', 'seqno'],
     checkEqual: function  (doc, res) {
         doc.id.should.equal(res.id);
         doc.branch.should.equal(res.branch);
