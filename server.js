@@ -12,9 +12,10 @@ mongoose.Promise = global.Promise;
 
 const {PORT, DATABASE_URL} = require('./config');
 
-const {LOCATIONS1} = require('./helpers/helper');
+const {LOCATIONS1, LOCATIONS2} = require('./helpers/helper');
 
 const locations1Router = require('./routers/locations1');
+const locations2Router = require('./routers/locations2');
 
 app.use(morgan('common'));
 
@@ -33,6 +34,7 @@ app.get('/lighting', (req, res) => {
 });
 
 app.use(LOCATIONS1.endpoint, locations1Router);
+app.use(LOCATIONS2.endpoint, locations2Router);
 
 // catch-all endpoint if client makes request to non-existent endpoint
 app.use('*', function(req, res) {
