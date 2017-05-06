@@ -64,11 +64,13 @@ function checkres(res, status, many) {
         res.body.forEach(function(item) {
             item.should.be.a('object');
             item.should.include.keys(LOCATIONS1.expected_keys);
+            item.id.should.not.be.null; // TRY THIS
         });
     }
     else {
-    res.body.should.be.a('object');
-    res.body.should.include.keys(LOCATIONS1.expected_keys);
+        res.body.should.be.a('object');
+        res.body.should.include.keys(LOCATIONS1.expected_keys);
+        res.body.id.should.not.be.null; // TRY THIS
     }
 }
 
@@ -97,17 +99,17 @@ describe('Locations_1 API resources', function() {
     2. prove res has right status, data type
     3. prove the number of records we got back is equal to number in db.
 */
-        let res;
-        it('should return all locations_1', function() {
+        it('should return all records', function() {
+            let _res;
             return chai.request(app)
                 .get(LOCATIONS1.endpoint)               // 1
-                .then(function(_res) {
-                    res = _res;
-                    checkres(res, 200, true);           // 2
+                .then(function(res) {
+                    _res = res;
+                    checkres(_res, 200, true);           // 2
                     return Locations1Model.count();
                 })
-                .then(function(count) {     // 3
-                    res.body.should.have.length.of(count);
+                .then(function(count) {                 // 3
+                    _res.body.should.have.length.of(count);
                 });
         });
 
@@ -142,18 +144,18 @@ describe('Locations_1 API resources', function() {
     4. verify fields have correct values
 */
         it('should get one record by id', function() {
-            let doc;
+            let _doc;
             return Locations1Model        // 1
                 .findOne()
                 .exec()
-                .then(function(_doc) {
-                    doc = _doc;
+                .then(function(doc) {
+                    _doc = doc;
                     return chai.request(app)
-                        .get(LOCATIONS1.endpoint+doc.id);     // 2
+                        .get(LOCATIONS1.endpoint+_doc.id);     // 2
                 })
                 .then(function(res) {
                     checkres(res, 200, false);                // 3
-                    LOCATIONS1.checkEqual(doc, res.body);     // 4
+                    LOCATIONS1.checkEqual(_doc, res.body);     // 4
                 });
         });
     });
@@ -175,107 +177,48 @@ describe('Locations_1 API resources', function() {
                 .post(LOCATIONS1.endpoint)              // 2
                 .send(data)
                 .then(function(res) {
-                    res.should.have.status(201);        // 3
-                /* jshint -W030 */
-                    res.should.be.json;
-                    res.body.should.be.a('object');
-                    res.body.should.include.keys(LOCATIONS1.expected_keys);
-                    res.body.id.should.not.be.null;
+                    checkres(res, 201, false);      // 3
 
                     data.id = res.body.id;
                     LOCATIONS1.checkEqual(data, res.body);     // 4
 
                     return Locations1Model.findById(res.body.id).exec();      // 5
                 })
-                .then(function(doc) {      // 6
-                    LOCATIONS1.checkEqual(doc, data);
+                .then(function(doc) {
+                    LOCATIONS1.checkEqual(doc, data);       // 6
                 });
         });
     });
 
-    describe('POST endpoint error conditions', function() {
+    describe.only('POST endpoint error conditions', function() {
 
 /*
 strategy:
-1. create a new record missing title field
-2. make a POST request with that record
-3. ensure status code = 400
+1. generate data
+2. loop on required keys.
+3.      remove key.
+4.      make a POST request with that record
+5.      ensure status code = 400
+6. end loop
 */
-        it('should fail to add a new record - missing title', function() {
-            const newBlog = generateData();
-            delete newBlog.title;
-            chai.request(app)
-                .post('/blog')
-                .send(newBlog)
-            .then(() => {
-                throw Error('should have failed with a 400');
-            })
-            .catch(e => {
-                e.status.should.equal(400);
-            });
-        });
+        it('should fail to add a new record - missing required field', function() {
+            const data = generateData(1);
+            for (var idx in LOCATIONS1.required_keys) {
+                let field = LOCATIONS1.required_keys[idx];
+                delete data[field];
 
-        /*
-strategy:
-1. create a new record missing content field
-2. make a POST request with that record
-3. ensure status code = 400
-*/
-        it('should fail to add a new record - missing content', function() {
-            const newBlog = generateData();
-            delete newBlog.content;
-            chai.request(app)
-                .post('/blog')
-                .send(newBlog)
-            .then(() => {
-                throw Error('should have failed with a 400');
-            })
-            .catch(e => {
-                e.status.should.equal(400);
-            });
-        });
-
-/*
-strategy:
-1. create a new record missing firstName field
-2. make a POST request with that record
-3. ensure status code = 400
-*/
-        it('should fail to add a new record - missing firstName', function() {
-            const newBlog = generateData();
-            delete newBlog.author.firstName;
-            chai.request(app)
-                .post('/blog')
-                .send(newBlog)
-            .then(() => {
-                throw Error('should have failed with a 400');
-            })
-            .catch(e => {
-                e.status.should.equal(400);
-            });
-        });
-
-/*
-strategy:
-1. create a new record missing lastName field
-2. make a POST request with that record
-3. ensure status code = 400
-*/
-        it('should fail to add a new record - missing lastName', function() {
-            const newBlog = generateData();
-            delete newBlog.author.lastName;
-            chai.request(app)
-                .post('/blog')
-                .send(newBlog)
-            .then(() => {
-                throw Error('should have failed with a 400');
-            })
-            .catch(e => {
-                e.status.should.equal(400);
-            });
+                chai.request(app)
+                    .post(LOCATIONS1.endpoint)
+                    .send(data)
+                .then(() => {
+                    throw Error('should have failed with a 400');
+                })
+                .catch(e => {
+                    e.status.should.equal(400);
+                });
+            }
         });
     });
-
 
     describe('DELETE endpoint', function() {
 /*
