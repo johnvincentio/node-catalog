@@ -1,6 +1,8 @@
 /*jshint browser: true, jquery: true */
 /*jshint multistr: true */
 
+/*
+use this for mocking data
 
 var MOCK_DATA = {
 "locations": {
@@ -219,21 +221,43 @@ var MOCK_DATA = {
   }
 };
 
-function getLocationsData(callbackFn) {
-    setTimeout(function(){ callbackFn(MOCK_DATA);}, 1);
+function getLocationsData(url, callback) {
+    setTimeout(function() {callback(MOCK_DATA);}, 100);
+}
+*/
+
+function getLocationsData(url, callback) {
+        console.log(">>> getLocations1Data");
+        var request = $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'GET'
+        });
+        request.done(function(data) {
+            console.log("addData");
+            callback(data);
+        });
+        request.fail(function(jqXHR, status) {
+            console.log("ajax get failed; "+status);
+        });
+        console.log("<<< getLocations1Data");
 }
 
-function displayLocations(data) {
-    for (var index in data.locations.hesLocations) {
-       $('#hes_locations').append('<p>' + data.locations.hesLocations[index].address + '</p>');
+function displayLocations1(data) {
+    for (var index in data) {
+       $('#hes_locations').append('<p>' + data[index].address + '</p>');
     }
-    for (index in data.locations.cineleaseLocations) {
-       $('#cinelease_locations').append('<p>' + data.locations.cineleaseLocations[index].address + '</p>');
+}
+
+function displayLocations2(data) {
+    for (var index in data) {
+       $('#cinelease_locations').append('<p>' + data[index].address + '</p>');
     }
 }
 
 function getAndDisplayLocations() {
-    getLocationsData(displayLocations);
+    getLocationsData("api/locations1/", displayLocations1);
+    getLocationsData("api/locations2/", displayLocations2);
 }
 
 $(function() {

@@ -10,8 +10,8 @@ var MOCK_DATA = {
     }
 };
 
-function getContent(callbackFn) {
-    setTimeout(function(){ callbackFn(MOCK_DATA);}, 1);
+function getContent(callbackFn) {       // Change this to get real data
+    setTimeout(function() {callbackFn(MOCK_DATA);}, 100);
 }
 
 function displayHomeContent(data) {

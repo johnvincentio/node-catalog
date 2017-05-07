@@ -2301,8 +2301,8 @@ var MOCK_DATA = {
   }
 };
 
-function getData(callbackFn) {
-    setTimeout(function(){ callbackFn(MOCK_DATA);}, 1);
+function getData(callbackFn) {      // Change this to get real data
+    setTimeout(function() {callbackFn(MOCK_DATA);}, 100);
 }
 
 function displayLighting(data) {
