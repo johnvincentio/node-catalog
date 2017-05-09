@@ -80,7 +80,7 @@ router.delete('/:id', (req, res) => {
 
 router.put('/:id', jsonParser, (req, res) => {
     console.log("Put request; req.params.id "+req.params.id);
-        if (! (req.params.id && req.body.id && req.params.id === req.body.id)) {
+    if (! (req.params.id && req.body.id && req.params.id === req.body.id)) {
         const message2 = (
             `Request path id (${req.params.id}) and request body id ${req.body.id}) must match`);
         console.error(message2);
